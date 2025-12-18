@@ -56,10 +56,11 @@ export interface Ticket {
   bookingId: number;
   userId: number;
   eventId: number;
-  ticketType: TicketType;
-  price: number;
   qrCode?: string;
   barcode?: string;
+  createdAt?: number[];
+  ticketType?: TicketType;
+  price?: number;
   isUsed?: boolean;
   usedAt?: number[];
 }

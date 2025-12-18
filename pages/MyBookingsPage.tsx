@@ -8,6 +8,7 @@ import BookingCard from '../components/BookingCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { Link } from 'react-router-dom';
 import Modal from '../components/Modal';
+import QRCode from 'react-qr-code';
 
 const MyBookingsPage: React.FC = () => {
   const { user } = useAuth();
@@ -179,45 +180,51 @@ const MyBookingsPage: React.FC = () => {
         {selectedBookingTickets.length > 0 ? (
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {selectedBookingTickets.map((ticket) => (
-              <div key={ticket.id} className="border border-neutral-200 rounded-xl p-4 bg-neutral-50 hover:bg-neutral-100 transition-colors duration-200">
+              <div key={ticket.id} className="border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-200">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="font-bold text-lg text-neutral-900">{ticket.ticketNumber}</p>
-                    <p className="text-sm text-neutral-600">Type: {ticket.ticketType}</p>
-                    <p className="text-sm text-neutral-600">Price: Rs. {ticket.price.toFixed(2)}</p>
+                    <p className="font-bold text-lg text-neutral-900 dark:text-neutral-50">{ticket.ticketNumber}</p>
+                    {ticket.ticketType && (
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Type: {ticket.ticketType}</p>
+                    )}
+                    {ticket.price !== undefined && (
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Price: Rs. {ticket.price.toFixed(2)}</p>
+                    )}
                   </div>
                   {ticket.isUsed && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 text-xs rounded-full font-semibold border border-green-300 dark:border-green-800 flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 text-xs rounded-full font-semibold border border-green-300 dark:border-green-800">
                       <CheckCircle2 size={14} />
                       Used
                     </span>
                   )}
                 </div>
                 {ticket.qrCode && (
-                  <div className="mt-3 pt-3 border-t border-neutral-200">
-                    <p className="text-xs font-semibold text-neutral-600 mb-2">QR Code</p>
-                    <img 
-                      src={`data:image/png;base64,${ticket.qrCode}`} 
-                      alt="QR Code" 
-                      className="w-32 h-32 mx-auto border border-neutral-300 rounded-lg p-2 bg-white"
-                    />
+                  <div className="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
+                    <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-2">QR Code</p>
+                    <div className="flex flex-col items-center">
+                      {/* If backend returns a data URI, render it as an image; otherwise render a generated QR code */}
+                      {ticket.qrCode.startsWith && ticket.qrCode.startsWith('data:') ? (
+                        <img src={ticket.qrCode} alt={`${ticket.ticketNumber} QR`} className="w-40 h-40 object-contain" />
+                      ) : (
+                        <div className="p-2 bg-white rounded-md">
+                          <QRCode value={ticket.qrCode} size={128} />
+                        </div>
+                      )}
+                      <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-2 break-all text-center">{ticket.qrCode}</p>
+                    </div>
                   </div>
                 )}
                 {ticket.barcode && (
-                  <div className="mt-3 pt-3 border-t border-neutral-200 text-center">
-                    <p className="text-xs font-semibold text-neutral-600 mb-2">Barcode</p>
-                    <img 
-                      src={`data:image/png;base64,${ticket.barcode}`} 
-                      alt="Barcode" 
-                      className="w-full max-w-xs h-16 mx-auto border border-neutral-300 rounded-lg p-2 bg-white"
-                    />
+                  <div className="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700 text-center">
+                    <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-2">Barcode</p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 break-all">{ticket.barcode}</p>
                   </div>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-center text-neutral-600">No tickets available for this booking.</p>
+          <p className="text-center text-neutral-600 dark:text-neutral-400">No tickets available for this booking.</p>
         )}
       </Modal>
     </div>
